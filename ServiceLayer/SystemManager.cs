@@ -1,5 +1,6 @@
 ﻿using static System.Console;
 using ConsoleTables;
+using System.Diagnostics;
 
 namespace ServiceLayer;
 
@@ -17,24 +18,34 @@ public static class SystemManager
         _inventoryManager = new InventoryManager();
         while(_selected != 6)
         {
-            // Clear the screen.
-            Clear();
+            try
+            {
+                // Clear the screen.
+                Clear();
 
-            // Print out the menu.
-            PrintSelection();
+                // Print out the menu.
+                PrintSelection();
 
-            // Get the user to input the selected function.
-            _selected = Convert.ToInt32(ReadLine());
+                // Get the user to input the selected function.
+                _selected = Convert.ToInt32(ReadLine());
 
-            // clear the screen again.
-            Clear();
+                // clear the screen again.
+                Clear();
 
-            // Manages which function to used.
-            SelectionManager();
-
-            // Stop the screen to show the information first.
-            WriteLine("Press Enter Key to continue..");
-            ReadLine();
+                // Manages which function to used.
+                SelectionManager();
+            }
+            catch
+            {
+                WriteLine("Invalid input.");
+            }
+            finally
+            {
+                // Stop the screen to show the information first.
+                WriteLine();
+                WriteLine("Press Enter Key to continue..");
+                ReadLine();
+            }
         }
     }
 
@@ -53,7 +64,10 @@ public static class SystemManager
         table.AddRow("5", "Get Inventory Total Value");
         table.AddRow("6", "Exit Console");
 
+        table.Options.EnableCount = false;
         table.Write();
+        WriteLine();
+        Write("input: ");
     }
 
 
@@ -98,17 +112,17 @@ public static class SystemManager
     {
         try
         {
+            Write("Product Name: ");
+            string? name = ReadLine();
+            if(string.IsNullOrWhiteSpace(name))
+            {
+                WriteLine("Invalid name.");
+                return;
+            }
+
             // Used checked statement to check for overflow.
             checked
             {
-                Write("Product Name: ");
-                string? name = ReadLine();
-                if(string.IsNullOrWhiteSpace(name))
-                {
-                    WriteLine("Invalid name.");
-                    return;
-                }
-
                 Write("Product Price: ");
                 decimal price = Convert.ToDecimal(ReadLine());
 
@@ -116,6 +130,8 @@ public static class SystemManager
                 uint qty = Convert.ToUInt32(ReadLine());
 
                 var result = _inventoryManager.AddProduct(new(name, qty, price));
+                Clear();
+
                 if(result)
                     WriteLine("Product is succesfully added.");
             }
@@ -140,6 +156,7 @@ public static class SystemManager
             int productId = Convert.ToInt32(ReadLine());
 
             var result = _inventoryManager.RemoveProduct(productId);
+            Clear();
             if(result)
                 WriteLine("Succesfully remove the product.");
         }
@@ -166,6 +183,8 @@ public static class SystemManager
                 int quantity = Convert.ToInt32(ReadLine());
 
                 var result = _inventoryManager.UpdateProduct(productId, quantity);
+
+                Clear();
                 if(result)
                     WriteLine("Successfully update the product");
             }

@@ -106,6 +106,7 @@ public class InventoryManager
         }
 
         table.Write();
+        Console.WriteLine();
     }
 
 
